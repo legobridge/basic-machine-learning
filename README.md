@@ -1,0 +1,1 @@
+This repository comprises the implementations of some fundamental machine learning algorithms. They have been written as part of an assignment for an on-campus course in BITS Pilani, Hyderabad Campus.
