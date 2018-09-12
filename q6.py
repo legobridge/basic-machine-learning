@@ -3,8 +3,6 @@ import pandas as pd
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
-data_filename = 'data2.xlsx'
-
 def import_data(file_name):
     """Use pandas to import an excel file."""
     dataframe = pd.read_excel(file_name, header=None, dtype=object)
