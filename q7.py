@@ -69,6 +69,6 @@ if __name__ == '__main__':
     print("Sensitivity : ", sensitivity)
     specificity = tn / (tn + fp)
     print("Specificity : ", specificity)
-    accuracy = tp + tn / (tp + fp + tn + fn)
+    accuracy = (tp + tn) / (tp + fp + tn + fn)
     print("Accuracy : ", accuracy)
 
