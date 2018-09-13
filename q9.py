@@ -9,8 +9,6 @@ def import_data(file_name):
     dataframe = pd.read_excel(file_name, header=None, dtype=object)
     data = dataframe.values
     m = data.shape[0]
-    train_set_size = (6 * m) // 10 # Take 60% of data for training.
-    test_set_size = m - train_set_size # Take the remaining for testing.
     np.random.shuffle(data)
     return data[:, 0:4], data[:, 4]
 
