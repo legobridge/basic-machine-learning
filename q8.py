@@ -156,9 +156,9 @@ if __name__ == '__main__':
             ova_accuracy += 1
     ova_class_accuracies /= ova_class_members
     ova_accuracy /= test_set_size
-    print("One vs. All Accuracy : ", ova_accuracy)
+    print('One vs. All Accuracy : ', ova_accuracy)
     for label in range(num_labels):
-        print("One vs. All Accuracy for label ", label + 1, " : ", ova_class_accuracies[label])
+        print('One vs. All Accuracy for label ', label + 1, ' : ', ova_class_accuracies[label])
 
     # Perform one vs. one logistic regression.
     W_ovo, W0_ovo = run_ovo_logistic_regression(50, 0.01, X_train, Y_train)
@@ -173,6 +173,6 @@ if __name__ == '__main__':
             ovo_accuracy += 1
     ovo_class_accuracies /= ovo_class_members
     ovo_accuracy /= test_set_size
-    print("One vs. One Accuracy : ", ovo_accuracy)
+    print('One vs. One Accuracy : ', ovo_accuracy)
     for label in range(num_labels):
-        print("One vs. One Accuracy for label ", label + 1, " : ", ovo_class_accuracies[label])
+        print('One vs. One Accuracy for label ', label + 1, ' : ', ovo_class_accuracies[label])
