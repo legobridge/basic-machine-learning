@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 
@@ -13,56 +14,70 @@ def import_data(file_name):
                                         data[train_set_size:, 0:4],
                                         data[0:train_set_size, 4],
                                         data[train_set_size:, 4])
-    X_train = X_train.T
-    X_test = X_test.T
+    X_train = X_train.T.astype(float)
+    X_test = X_test.T.astype(float)
     Y_train.resize((1, train_set_size))
     Y_test.resize((1, test_set_size))
     return X_train, X_test, Y_train, Y_test
 
-def sigmoid(Z):
-    """Apply the sigmoid function to the input Z."""
-    return 1 / (1 + np.exp(-Z.astype(float)))
+def gaussian(X_train, X_test):
+    """Compute Gaussian probability given X_train and X_test."""
+    n = X_test.shape[0]
+    m = X_test.shape[1]
 
-def run_logistic_regression(num_iterations, learning_rate, X, Y):
-    """Run logistic regression on X and return computed weights."""
-    n = X.shape[0]
-    m = X.shape[1]
+    # Calculate parameter values required for the Gaussian model.
+    mu = np.mean(X_train, axis=1, keepdims=True)
+    cov = np.cov(X_train)
+    err = X_test - mu
+    cov_det = np.linalg.det(cov)
+    cov_inv = np.linalg.inv(cov)
+
+    # Calculate constant left half of the distribution.
+    l = 1 / ((((2*math.pi) ** n) * cov_det) ** 0.5)
+
+    # Calculate right half of the distribution for each example.
+    r = np.empty(m)
+    for i in range(m):
+        r[i] = np.exp((-0.5) * np.dot(err[:, i].T, np.dot(cov_inv, err[:, i])))
+    return l * r
+
+def predict(X_train, Y_train, X_test):
+    """Make predictions on X_test based on the training data."""
+    train_set_size = X_train.shape[1]
+    test_set_size = X_test.shape[1]
+
+    # Separate out training data according to labels.
+    X_train_sep = [X_train[:, Y_train[0] == 1], X_train[:, Y_train[0] == 2]]
+    # Compute priors.
+    freq_labels = np.array([np.count_nonzero(Y_train == 1), np.count_nonzero(Y_train == 2)])
+    priors = freq_labels / train_set_size
     
-    # Initialize weights.
-    W = np.random.randn(n, 1)
-    W0 = 0
+    # Calculate probibilities p(X|y) for both models.
+    probs_x_given_y = np.array([gaussian(X_train_sep[i], X_test) for i in range(2)])
 
-    for iteration in range(num_iterations):
-        h = sigmoid(np.dot(W.T, X) + W0)
-        cost = -(1 / m) * np.sum((Y*np.log(h) + (1 - Y)*np.log(1 - h)))
-        dW = (1 / m) * np.dot(X, (h - Y).T)
-        W = W - learning_rate*dW
-        dW0 = (1 / m) * np.sum(h - Y)
-        W0 = W0 - learning_rate*dW0
-    return W, W0
-
-def predict(X, W, W0):
-    """Make predictions on X based on the weights provided."""
-    h = sigmoid(np.dot(W.T, X) + W0)
-    predictions = h
-    predictions[h < 0.5], predictions[h >= 0.5] = 0, 1
-    return predictions + 1
+    # Make predictions based on LRT rule.
+    predictions = np.empty((1, test_set_size))
+    for i in range(test_set_size):
+        if probs_x_given_y[0, i] / probs_x_given_y[1, i] >= priors[1] / priors[0]:
+            predictions[0, i] = 1
+        else:
+            predictions[0, i] = 2
+    return predictions
 
 if __name__ == '__main__':
     X_train, X_test, Y_train, Y_test = import_data('data3.xlsx')
 
-    W, W0 = run_logistic_regression(100, 0.01, X_train, Y_train - 1)
-    predictions = predict(X_test, W, W0)
+    predictions = predict(X_train, Y_train, X_test)
     test_set_size = Y_test.shape[1]
     tp, fp, tn, fn = 0, 0, 0, 0
     for i in range(test_set_size):
-        if predictions[0][i] == 2 and Y_test[0][i] == 2:
+        if predictions[0, i] == 2 and Y_test[0, i] == 2:
             tp += 1
-        if predictions[0][i] == 2 and Y_test[0][i] == 1:
+        if predictions[0, i] == 2 and Y_test[0, i] == 1:
             fp += 1
-        if predictions[0][i] == 1 and Y_test[0][i] == 1:
+        if predictions[0, i] == 1 and Y_test[0, i] == 1:
             tn += 1
-        if predictions[0][i] == 1 and Y_test[0][i] == 2:
+        if predictions[0, i] == 1 and Y_test[0, i] == 2:
             fn += 1
     print(tp, fp, tn, fn)
     sensitivity = tp / (tp + fn)
