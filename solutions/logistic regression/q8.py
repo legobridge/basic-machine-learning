@@ -139,7 +139,7 @@ def ovo_predict(X, W, W0):
     return predictions
 
 if __name__ == '__main__':
-    X_train, X_test, Y_train, Y_test = import_data('data4.xlsx')
+    X_train, X_test, Y_train, Y_test = import_data('../../datasets/data4.xlsx')
     normalize_inputs(X_train, X_test)
     test_set_size = Y_test.shape[1]
 

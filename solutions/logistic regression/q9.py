@@ -78,7 +78,7 @@ def ova_predict(X, W, W0):
     return predictions
 
 if __name__ == '__main__':
-    X, Y = import_data('data4.xlsx')
+    X, Y = import_data('../../datasets/data4.xlsx')
     m = Y.shape[0]
     test_set_size = m // 5
     X = X.T

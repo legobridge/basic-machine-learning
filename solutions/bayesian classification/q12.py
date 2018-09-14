@@ -50,26 +50,20 @@ def predict(X_train, Y_train, X_test):
 
     # Separate out training data according to labels.
     X_train_sep = [X_train[:, Y_train[0] == label] for label in range(1, num_labels + 1)]
-    
-    # Compute priors.
-    freq_labels = np.array([np.count_nonzero(Y_train == label) for label in range(1, num_labels + 1)])
-    priors = freq_labels / train_set_size
-    priors.resize((num_labels, 1))
 
-    # Calculate probibilities p(X|y) and p(X|y)*p(y) for all models.
+    # Calculate likelihood probibilities p(X|y) for all models.
     probs_x_given_y = np.array([gaussian(X_train_sep[i], X_test) for i in range(num_labels)])
-    posterior = probs_x_given_y * priors
 
-    # Make predictions based on MAP rule.
-    predictions = np.argmax(posterior, axis=0) + 1
+    # Make predictions based on ML rule.
+    predictions = np.argmax(probs_x_given_y, axis=0) + 1
     predictions.resize((1, test_set_size))
     return predictions
 
 if __name__ == '__main__':
-    X_train, X_test, Y_train, Y_test = import_data('data4.xlsx')
+    X_train, X_test, Y_train, Y_test = import_data('../../datasets/data4.xlsx')
     test_set_size = Y_test.shape[1]
 
-    # Perform MAP predictions.
+    # Perform ML predictions.
     predictions = predict(X_train, Y_train, X_test)
     class_accuracies = np.zeros(num_labels)
     class_members = np.zeros(num_labels)

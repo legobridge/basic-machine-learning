@@ -39,7 +39,7 @@ def find_clusters(X, k, iterations):
     return labels, centroids
 
 if __name__ == '__main__':
-    X = import_data('data2.xlsx')
+    X = import_data('../../datasets/data2.xlsx')
 
     labels, centroids = find_clusters(X, k=2, iterations=10)
     m = X.shape[0]

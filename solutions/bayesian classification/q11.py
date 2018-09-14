@@ -2,12 +2,14 @@ import math
 import numpy as np
 import pandas as pd
 
+num_labels = 3
+
 def import_data(file_name):
     """Import an excel file and divide it into training and test sets."""
     dataframe = pd.read_excel(file_name, header=None, dtype=object)
     data = dataframe.values
     m = data.shape[0]
-    train_set_size = (6 * m) // 10 # Take 60% of data for training.
+    train_set_size = (7 * m) // 10 # Take 70% of data for training.
     test_set_size = m - train_set_size # Take the remaining for testing.
     np.random.shuffle(data)
     X_train, X_test, Y_train, Y_test = (data[0:train_set_size, 0:4],
@@ -47,43 +49,38 @@ def predict(X_train, Y_train, X_test):
     test_set_size = X_test.shape[1]
 
     # Separate out training data according to labels.
-    X_train_sep = [X_train[:, Y_train[0] == 1], X_train[:, Y_train[0] == 2]]
-    # Compute priors.
-    freq_labels = np.array([np.count_nonzero(Y_train == 1), np.count_nonzero(Y_train == 2)])
-    priors = freq_labels / train_set_size
+    X_train_sep = [X_train[:, Y_train[0] == label] for label in range(1, num_labels + 1)]
     
-    # Calculate probibilities p(X|y) for both models.
-    probs_x_given_y = np.array([gaussian(X_train_sep[i], X_test) for i in range(2)])
+    # Compute priors.
+    freq_labels = np.array([np.count_nonzero(Y_train == label) for label in range(1, num_labels + 1)])
+    priors = freq_labels / train_set_size
+    priors.resize((num_labels, 1))
 
-    # Make predictions based on LRT rule.
-    predictions = np.empty((1, test_set_size))
-    for i in range(test_set_size):
-        if probs_x_given_y[0, i] / probs_x_given_y[1, i] >= priors[1] / priors[0]:
-            predictions[0, i] = 1
-        else:
-            predictions[0, i] = 2
+    # Calculate probibilities p(X|y) and p(X|y)*p(y) for all models.
+    probs_x_given_y = np.array([gaussian(X_train_sep[i], X_test) for i in range(num_labels)])
+    posterior = probs_x_given_y * priors
+
+    # Make predictions based on MAP rule.
+    predictions = np.argmax(posterior, axis=0) + 1
+    predictions.resize((1, test_set_size))
     return predictions
 
 if __name__ == '__main__':
-    X_train, X_test, Y_train, Y_test = import_data('data3.xlsx')
-
-    predictions = predict(X_train, Y_train, X_test)
+    X_train, X_test, Y_train, Y_test = import_data('../../datasets/data4.xlsx')
     test_set_size = Y_test.shape[1]
-    tp, fp, tn, fn = 0, 0, 0, 0
-    for i in range(test_set_size):
-        if predictions[0, i] == 2 and Y_test[0, i] == 2:
-            tp += 1
-        if predictions[0, i] == 2 and Y_test[0, i] == 1:
-            fp += 1
-        if predictions[0, i] == 1 and Y_test[0, i] == 1:
-            tn += 1
-        if predictions[0, i] == 1 and Y_test[0, i] == 2:
-            fn += 1
-    print(tp, fp, tn, fn)
-    sensitivity = tp / (tp + fn)
-    print("Sensitivity : ", sensitivity)
-    specificity = tn / (tn + fp)
-    print("Specificity : ", specificity)
-    accuracy = (tp + tn) / (tp + fp + tn + fn)
-    print("Accuracy : ", accuracy)
 
+    # Perform MAP predictions.
+    predictions = predict(X_train, Y_train, X_test)
+    class_accuracies = np.zeros(num_labels)
+    class_members = np.zeros(num_labels)
+    accuracy = 0
+    for i in range(test_set_size):
+        class_members[Y_test[0, i] - 1] += 1
+        if predictions[0, i] == Y_test[0, i]:
+            class_accuracies[Y_test[0, i] - 1] += 1
+            accuracy += 1
+    class_accuracies /= class_members
+    accuracy /= test_set_size
+    print('Accuracy : ', accuracy)
+    for label in range(num_labels):
+        print('Accuracy for label ', label + 1, ' : ', class_accuracies[label])

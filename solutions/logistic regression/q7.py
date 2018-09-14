@@ -49,7 +49,7 @@ def predict(X, W, W0):
     return predictions + 1
 
 if __name__ == '__main__':
-    X_train, X_test, Y_train, Y_test = import_data('data3.xlsx')
+    X_train, X_test, Y_train, Y_test = import_data('../../datasets/data3.xlsx')
 
     W, W0 = run_logistic_regression(100, 0.01, X_train, Y_train - 1)
     predictions = predict(X_test, W, W0)

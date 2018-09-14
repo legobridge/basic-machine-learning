@@ -13,7 +13,7 @@ import pandas as pd
 '''
 def import_data():
 
-    file_name = 'data.xlsx'
+    file_name = '../../datasets/data.xlsx'
     dataframe = pd.read_excel(file_name, header=None, dtype=object)
     data = dataframe.values
     X, Y = data[:, 0:2], data[:, 2]

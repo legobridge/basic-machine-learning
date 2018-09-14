@@ -13,7 +13,7 @@ import pandas as pd
 '''
 def import_data():
 
-    file_name = 'data.xlsx'
+    file_name = '../../datasets/data.xlsx'
     dataframe = pd.read_excel(file_name, header=None, dtype=object)
     data = dataframe.values
     X, Y = data[:, 0:2], data[:, 2]
@@ -23,12 +23,12 @@ def import_data():
 
 
 '''
-    Runs Stochastic Gradient Descent.
+    Runs Batch Gradient Descent.
     Returns:
     W0, W - The optimized weights
     costs - A record of the costs at all iterations
 '''
-def run_stochastic_gd(num_iterations, learning_rate, X, Y):
+def run_batch_gd(num_iterations, learning_rate, X, Y):
 
     m = X.shape[1]
     W0 = np.zeros(1)
@@ -38,14 +38,16 @@ def run_stochastic_gd(num_iterations, learning_rate, X, Y):
 
     for iteration in range(num_iterations):
         cost = 0
+        dW0 = 0
+        dW = 0
         for i in range(m):
             prediction = W0 + W[0]*X[0][i] + W[1]*X[1][i]
             err = prediction - Y[i]
             cost += 0.5 * np.square(err)
-            dW0 = err
-            dW = err * np.array([[X[0][i]], [X[1][i]]])
-            W0 = W0 - learning_rate * dW0
-            W = W - learning_rate * dW
+            dW0 += err
+            dW += err * np.array([[X[0][i]], [X[1][i]]])
+        W0 = W0 - (learning_rate * dW0) / m
+        W = W - (learning_rate * dW) / m
         costs[iteration] = cost / m
 
     return W0, W, costs
@@ -62,7 +64,8 @@ def plot(W0, costs, X, Y):
 
     fig1, ax1 = plt.subplots()
     ax1.plot(costs)
-    ax1.set(xlabel='Iterations', ylabel='Cost', title='Stochastic Gradient Descent')
+    ax1.set(xlabel='Iterations', ylabel='Cost', title='Batch Gradient Descent')
+    ax1.set_ylim((0, 120))
     ax1.grid()
 
     fig2 = plt.figure()
@@ -92,11 +95,11 @@ def plot(W0, costs, X, Y):
     ax2.zaxis.set_major_formatter(FormatStrFormatter('%0.0e'))
 
     plt.show()
-
+    
 
 if __name__ == '__main__':
 
     X, Y = import_data()
-    W0, W, costs = run_stochastic_gd(200, 0.0000001, X, Y)
+    W0, W, costs = run_batch_gd(2000, 0.000001, X, Y)
     plot(W0, costs, X, Y)
     print("Final weight vector : ", [W0[0], W[0][0], W[1][0]])
