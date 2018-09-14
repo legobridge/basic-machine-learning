@@ -5,14 +5,8 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import pandas as pd
 
-'''
-    Uses pandas to import the excel file.
-    Returns:
-    X - Feature matrix
-    Y - Label vector
-'''
 def import_data():
-
+    """Import data from an excel file."""
     file_name = '../../datasets/data.xlsx'
     dataframe = pd.read_excel(file_name, header=None, dtype=object)
     data = dataframe.values
@@ -21,15 +15,8 @@ def import_data():
     Y = Y.T
     return X, Y
 
-
-'''
-    Runs a vectorized version of Batch Gradient Descent.
-    Returns:
-    W0, W - The optimized weights
-    costs - A record of the costs at all iterations
-'''
-def run_batch_gd(num_iterations, learning_rate, X, Y):
-
+def run_vectorized_batch_gd(num_iterations, learning_rate, X, Y):
+    """Run vectorized batch gradient descent and return the weights and costs."""
     m = X.shape[1]
     W0 = np.zeros(1)
     W = np.array([[0.3], [0]])
@@ -48,12 +35,8 @@ def run_batch_gd(num_iterations, learning_rate, X, Y):
 
     return W0, W, costs
 
-
-''' 
-    Plots Cost vs. num_iterations
-'''
 def plot(costs, graph_title):
-
+    """Plot the graph of costs vs. num_iterations"""
     fig1, ax1 = plt.subplots()
     ax1.plot(costs)
     ax1.set(xlabel='Iterations', ylabel='Cost', title=graph_title)
@@ -65,6 +48,6 @@ def plot(costs, graph_title):
 if __name__ == '__main__':
 
     X, Y = import_data()
-    W0, W, costs = run_batch_gd(2000, 0.000001, X, Y)
+    W0, W, costs = run_vectorized_batch_gd(2000, 0.000001, X, Y)
     plot(costs, 'Vectorized Batch Gradient Descent')
     print("Final weight vector : ", [W0[0], W[0][0], W[1][0]])

@@ -5,14 +5,8 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import pandas as pd
 
-'''
-    Uses pandas to import the excel file.
-    Returns:
-    X - Feature matrix
-    Y - Label vector
-'''
 def import_data():
-
+    """Import data from an excel file."""
     file_name = '../../datasets/data.xlsx'
     dataframe = pd.read_excel(file_name, header=None, dtype=object)
     data = dataframe.values
@@ -21,15 +15,8 @@ def import_data():
     Y = Y.T
     return X, Y
 
-
-'''
-    Runs Batch Gradient Descent for Ridge Regression.
-    Returns:
-    W0, W - The optimized weights
-    costs - A record of the costs at all iterations
-'''
 def run_batch_gd(num_iterations, learning_rate, lambd, X, Y):
-
+    """Run batch gradient descent with ridge regression."""
     m = X.shape[1]
     W0 = np.zeros(1)
     W = np.array([[0.3], [0]])
@@ -52,15 +39,8 @@ def run_batch_gd(num_iterations, learning_rate, lambd, X, Y):
 
     return W0, W, costs
 
-
-'''
-    Runs Stochastic Gradient Descent for Ridge Regression.
-    Returns:
-    W0, W - The optimized weights
-    costs - A record of the costs at all iterations
-'''
 def run_stochastic_gd(num_iterations, learning_rate, lambd, X, Y):
-
+    """Run stochastic gradient descent with ridge regression."""
     m = X.shape[1]
     W0 = np.zeros(1)
     W = np.array([[0.3], [0]])
@@ -81,22 +61,18 @@ def run_stochastic_gd(num_iterations, learning_rate, lambd, X, Y):
 
     return W0, W, costs
 
-
-''' 
-    Plots two graphs:
-    1) Cost vs. num_iterations
-    2) Surface graph of Cost vs. W1 and W2
-'''
 def plot(W0, costs, X, Y, lambd, graph_title):
-
+    """Plot the two graphs."""
     m = X.shape[1]
 
+    # Plot the graph of Cost vs. iterations.
     fig1, ax1 = plt.subplots()
     ax1.plot(costs)
     ax1.set(xlabel='Iterations', ylabel='Cost', title=graph_title)
     ax1.set_ylim((0, 120))
     ax1.grid()
 
+    # Plot the graph of Cost vs. W1 and W2.
     fig2 = plt.figure()
     ax2 = fig2.gca(projection='3d')
     W1s = np.linspace(-0.4, 0.4, 100)
