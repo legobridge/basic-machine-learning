@@ -6,7 +6,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import pandas as pd
 
 def import_data():
-	"""Import data from an excel file."""
+    """Import data from an excel file."""
     file_name = '../../datasets/data.xlsx'
     dataframe = pd.read_excel(file_name, header=None, dtype=object)
     data = dataframe.values
@@ -16,13 +16,11 @@ def import_data():
     return X, Y
 
 def run_batch_gd(num_iterations, learning_rate, X, Y):
-	"""Run batch gradient descent and return the weights and costs."""
+    """Run batch gradient descent and return the weights and costs."""
     m = X.shape[1]
     W0 = np.zeros(1)
     W = np.array([[0.3], [0]])
-
     costs = np.zeros(num_iterations)
-
     for iteration in range(num_iterations):
         cost = 0
         dW0 = 0
@@ -36,11 +34,10 @@ def run_batch_gd(num_iterations, learning_rate, X, Y):
         W0 = W0 - (learning_rate * dW0) / m
         W = W - (learning_rate * dW) / m
         costs[iteration] = cost / m
-
     return W0, W, costs
 
 def plot(W0, costs, X, Y):
-	"""Plot the two graphs."""
+    """Plot the two graphs."""
     m = X.shape[1]
 
     # Plot the graph of Cost vs. iterations.
@@ -51,30 +48,27 @@ def plot(W0, costs, X, Y):
     ax1.grid()
 
     # Plot the graph of Cost vs. W1 and W2.
-    fig2 = plt.figure()
-    ax2 = fig2.gca(projection='3d')
-    W1s = np.linspace(-0.4, 0.4, 100)
-    W2s = np.linspace(-0.1, 0.1, 100)
-    costs = np.zeros((100, 100))
-
-    for i in range(100):
-        for j in range(100):
-            W_temp = np.array([[W1s[i]], [W2s[j]]])
+    num_samples = 100
+    W1s = np.linspace(-1.00, 1.00, num_samples)
+    W2s = np.linspace(-0.02, 0.04, num_samples)
+    W1s, W2s = np.meshgrid(W1s, W2s)
+    costs = np.zeros((num_samples, num_samples))
+    for i in range(num_samples):
+        for j in range(num_samples):
+            W_temp = np.array([[W1s[0, j]], [W2s[i, 0]]])
             predictions_temp = W0 + np.dot(W_temp.T, X)
             err_temp = predictions_temp - Y
-            costs[i][j] = (0.5  / m) * (np.sum(np.square(err_temp)))
+            costs[i, j] = (0.5  / m) * (np.sum(np.square(err_temp)))
 
-    W1s, W2s = np.meshgrid(W1s, W2s)
+    fig2 = plt.figure()
+    ax2 = fig2.gca(projection='3d')
     surf = ax2.plot_surface(W1s, W2s, costs, cmap=cm.coolwarm, linewidth=0, antialiased=False)
     ax2.set_xlabel('W1', fontdict=dict(weight='heavy'))
     ax2.set_ylabel('W2', fontdict=dict(weight='heavy'))
     ax2.set_zlabel('Cost', fontdict=dict(weight='heavy'))
     fig2.colorbar(surf, shrink=0.5, aspect=5)
-    ax2.xaxis.set_major_locator(LinearLocator(10))
     ax2.xaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-    ax2.yaxis.set_major_locator(LinearLocator(10))
     ax2.yaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-    ax2.zaxis.set_major_locator(LinearLocator(10))
     ax2.zaxis.set_major_formatter(FormatStrFormatter('%0.0e'))
 
     plt.show()

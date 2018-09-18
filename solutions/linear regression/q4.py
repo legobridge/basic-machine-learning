@@ -20,9 +20,7 @@ def run_vectorized_batch_gd(num_iterations, learning_rate, X, Y):
     m = X.shape[1]
     W0 = np.zeros(1)
     W = np.array([[0.3], [0]])
-
     costs = np.zeros(num_iterations)
-
     for iteration in range(num_iterations):
         predictions = W0 + np.dot(W.T, X)
         err = predictions - Y
@@ -32,7 +30,6 @@ def run_vectorized_batch_gd(num_iterations, learning_rate, X, Y):
         dW.resize((2, 1))
         W0 = W0 - learning_rate * np.sum(err) / m
         W = W - learning_rate * dW / m
-
     return W0, W, costs
 
 def plot(costs, graph_title):

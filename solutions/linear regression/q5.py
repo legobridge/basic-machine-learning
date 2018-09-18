@@ -20,9 +20,7 @@ def run_batch_gd(num_iterations, learning_rate, lambd, X, Y):
     m = X.shape[1]
     W0 = np.zeros(1)
     W = np.array([[0.3], [0]])
-
     costs = np.zeros(num_iterations)
-
     for iteration in range(num_iterations):
         cost = 0
         dW0 = 0
@@ -36,7 +34,6 @@ def run_batch_gd(num_iterations, learning_rate, lambd, X, Y):
         W0 = W0 - (learning_rate * dW0) / m
         W = W - (learning_rate * dW) / m
         costs[iteration] = cost / m
-
     return W0, W, costs
 
 def run_stochastic_gd(num_iterations, learning_rate, lambd, X, Y):
@@ -44,9 +41,7 @@ def run_stochastic_gd(num_iterations, learning_rate, lambd, X, Y):
     m = X.shape[1]
     W0 = np.zeros(1)
     W = np.array([[0.3], [0]])
-
     costs = np.zeros(num_iterations)
-
     for iteration in range(num_iterations):
         cost = 0
         for i in range(m):
@@ -58,7 +53,6 @@ def run_stochastic_gd(num_iterations, learning_rate, lambd, X, Y):
             W0 = W0 - learning_rate * dW0
             W = W - learning_rate * dW
         costs[iteration] = cost / m
-
     return W0, W, costs
 
 def plot(costs, graph_title):
